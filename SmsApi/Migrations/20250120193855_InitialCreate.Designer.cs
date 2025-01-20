@@ -11,7 +11,7 @@ using SmsApi.Data;
 namespace SmsApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250119014653_InitialCreate")]
+    [Migration("20250120193855_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

@@ -33,7 +33,7 @@ namespace SmsApi.Controllers
             }
 
         // buscar mensagem no banco
-        var message = await _context.SmsMessages.FindAsync(id);
+        var message = _context.SmsMessages.FirstOrDefault(s => s.Id == id);
         if (message == null){
             return NotFound(new { message = $"Mensagem con ID {id} não encontrada. "});
         }
@@ -62,6 +62,45 @@ namespace SmsApi.Controllers
             .ToListAsync();
 
             return Ok(messages);
+        }
+
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllMessages(){
+
+            var messages = await _context.SmsMessages.ToListAsync();
+
+            return Ok(messages);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateMessage([FromBody] SmsMessage newMessage){
+            if (string.IsNullOrWhiteSpace(newMessage.Phone) || string.IsNullOrWhiteSpace(newMessage.Message)){
+
+                return BadRequest(new { message = "Número de telefone e mensagem são obrigatorios"});
+            }
+
+            newMessage.CreatedAt = DateTime.UtcNow;
+            newMessage.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SmsMessages.AddAsync(newMessage);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetMessagesByStatus), new { id = newMessage.Id }, newMessage);
+
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> DeleteMessage(int id){
+
+            var message = await _context.SmsMessages.FindAsync(id);
+            if (message == null){
+                return NotFound(new { message = $"Mensagem com ID {id} não encontrada. "});
+            }
+
+            _context.SmsMessages.Remove(message);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Mensagem deletada com sucesso"});
         }
     }
 }
