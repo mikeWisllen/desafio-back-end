@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>Envio de Mensagens</title>
+</head>
+<body>
+  <div class="container">
+    <h1>Envio de Mensagens</h1>
+    <form id="messageForm">
+      <label for="phone">Número de Telefone:</label>
+      <input type="text" id="phone" name="phone" placeholder="Digite o número (Ex: 11999999999)" required />
+
+      <label for="message">Mensagem:</label>
+      <textarea id="message" name="message" rows="4" placeholder="Digite a mensagem" required></textarea>
+
+      <button type="submit">Enviar Mensagem</button>    
+    </form>
+
+    <div id="response" class="message"></div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

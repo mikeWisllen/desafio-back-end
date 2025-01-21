@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmsApi.Data;
@@ -14,6 +15,7 @@ namespace SmsApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("DevPolicy")]
     public class SmsController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -73,21 +75,22 @@ namespace SmsApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateMessage([FromBody] SmsMessage newMessage){
-            if (string.IsNullOrWhiteSpace(newMessage.Phone) || string.IsNullOrWhiteSpace(newMessage.Message)){
-
-                return BadRequest(new { message = "Número de telefone e mensagem são obrigatorios"});
+        public async Task<IActionResult> CreateSmsMessage([FromBody] SmsMessage newMessage)
+        {
+            if (newMessage == null || string.IsNullOrEmpty(newMessage.Phone) || string.IsNullOrEmpty(newMessage.Message))
+            {
+                return BadRequest(new { message = "Telefone e mensagem são obrigatórios." });
             }
 
-            newMessage.CreatedAt = DateTime.UtcNow;
-            newMessage.UpdatedAt = DateTime.UtcNow;
+            newMessage.CreatedAt = DateTime.UtcNow; // Certifique-se de definir a data de criação
 
-            await _context.SmsMessages.AddAsync(newMessage);
-            await _context.SaveChangesAsync();
+            _context.SmsMessages.Add(newMessage);
 
-            return CreatedAtAction(nameof(GetMessagesByStatus), new { id = newMessage.Id }, newMessage);
+            await _context.SaveChangesAsync(); // Salva as mudanças no banco de dados
 
+            return CreatedAtAction(nameof(CreateSmsMessage), new { id = newMessage.Id }, newMessage);
         }
+
 
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteMessage(int id){

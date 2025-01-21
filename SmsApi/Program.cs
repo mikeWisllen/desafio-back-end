@@ -11,6 +11,18 @@ builder.Services.AddSwaggerGen();
 // Adicione o serviço de autorização
 builder.Services.AddAuthorization();
 
+// Configuração de CORS
+builder.Services.AddCors(options => {
+
+    options.AddPolicy("DevPolicy", policy =>{
+
+        policy.WithOrigins("http://127.0.0.1:5500")
+        .AllowAnyMethod()
+        .AllowAnyHeader();
+    });
+
+});
+
 // Configuração do banco de dados MYSQL
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -27,6 +39,7 @@ app.UseSwaggerUI();
 // Remova ou comente esta linha
 //app.UseHttpsRedirection();
 
+app.UseCors("DevPolicy");
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
